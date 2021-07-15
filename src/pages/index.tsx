@@ -14,22 +14,23 @@ export default function Home({ list }: IPropsComponent) {
       <Container>
         <h1>Filmes em destaque</h1>
         <div>
-          {list.map((item, index) => (
-            <div key={index}>
-              <Link href={`/post/${item.id}`}>
-                <a>
-                  <Image
-                    src={`http://image.tmdb.org/t/p/original${item.poster_path}`}
-                    alt="Landscape picture"
-                    width={200}
-                    height={270}
-                  />
-
-                  <p>{item.title}</p>
-                </a>
-              </Link>
-            </div>
-          ))}
+          {list
+            .filter((item) => item.title !== undefined)
+            .map((item, index) => (
+              <div key={index}>
+                <Link href={`/movie/${item.id}`}>
+                  <a>
+                    <Image
+                      src={`http://image.tmdb.org/t/p/original${item.poster_path}`}
+                      alt="Landscape picture"
+                      width={200}
+                      height={270}
+                    />
+                    <p>{item.title}</p>
+                  </a>
+                </Link>
+              </div>
+            ))}
         </div>
       </Container>
     </Layout>
