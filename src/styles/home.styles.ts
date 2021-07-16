@@ -9,19 +9,52 @@ export const Container = styled.div`
     margin: 40px 0;
   }
 
-
-  > div {
-    width: 100%;
+  form {
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    justify-content: center;
 
+    input {
+      margin-bottom: 40px;
+      height: 40px;
+      width: 250px;
+      border: 0;
+      background-color: #ffffff;
+      border-radius: 5px;
+      padding: 0 20px;
+      font-size: 16px;
+    }
     
-    > div {
-      width: 20%;
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
+    button {
+      height: 40px;
+      background-color: #111111;
+      font-weight: bold;
+      color: #ffffff;
+      padding: 0 10px;
+      border: 0;
+    }
+  }
+    
+  p {
+    text-align: center;
+    font-weight: bold;
+  }
+`
+
+export const MoviesContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  
+  > div {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+
+    @media(max-width: 760px) {
+      width: 100%;
     }
   }
 `

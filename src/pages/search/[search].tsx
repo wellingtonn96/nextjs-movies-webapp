@@ -1,24 +1,30 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Layout from "../components/Layout";
-import { Container, MoviesContainer } from "../styles/home.styles";
+import Layout from "../../components/Layout";
+import { Container, MoviesContainer } from "../../styles/home.styles";
 import Link from "next/link";
-import { args } from "../configs/api";
+import { args } from "../../configs/api";
 
 interface IPropsComponent {
-  list: any[];
+  results: any[];
 }
-
-export default function Home({ list }: IPropsComponent) {
+export default function Home({ results }: IPropsComponent) {
   const router = useRouter();
+  // const [data, setData] = useState(results);
   const [search, setSearch] = useState("");
 
   async function handleSearchMovie(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    return router.push(`/search/${search}`);
+    router.push({
+      pathname: `/search/${search}`,
+    });
   }
+
+  // useEffect(() => {
+  //   setData(results);
+  // }, [results]);
 
   return (
     <Layout>
@@ -32,9 +38,9 @@ export default function Home({ list }: IPropsComponent) {
           />
           <button type="submit">Pesquisar</button>
         </form>
-        {list && list.length > 0 ? (
+        {results && results.length > 0 ? (
           <MoviesContainer>
-            {list
+            {results
               .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
@@ -59,21 +65,20 @@ export default function Home({ list }: IPropsComponent) {
     </Layout>
   );
 }
+export async function getServerSideProps({
+  params,
+}: {
+  params: {
+    search: string;
+  };
+}) {
+  const response = await fetch(
+    `${args.base_url}/search/movie?api_key=${args.api_key}&language=pt-BR&query=${params.search}`
+  );
 
-/* ---------------Server Side Rendering--------------------------*/
-
-// função que será executada ainda no lado do servidor onde os dados vai
-// ser repassado para o component e tudo ainda sera executado no lado servidor
-// Quando chegar no cliente só o componente será executado novamente, mas já com os dados.
-
-export async function getServerSideProps() {
-  const res = await fetch("http://localhost:3000/api/trending");
-
-  const { list } = (await res.json()) as any;
+  const list = await response.json();
 
   return {
-    props: {
-      list,
-    },
+    props: list,
   };
 }
