@@ -49,7 +49,10 @@ export default class MyDocument extends Document {
             rel="stylesheet"
           />
 
-          <link rel="icon" href="https://rocketseat.com.br/favicon.ico" />
+          <link
+            rel="icon"
+            href="https://icons.iconarchive.com/icons/icons8/windows-8/256/Cinema-Captain-America-icon.png"
+          />
         </Head>
         <body>
           <Main />
