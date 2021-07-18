@@ -12,17 +12,21 @@ interface IPropsComponent {
   list: any[];
   page: number;
   total_pages: number;
+  searchParam: string;
 }
 
-export default function Home({ list, page, total_pages }: IPropsComponent) {
+export default function Home({
+  list,
+  page,
+  total_pages,
+  searchParam,
+}: IPropsComponent) {
   const router = useRouter();
   // const [data, setData] = useState(results);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [search, setSearch] = useState(searchParam);
+  const [, setCurrentPage] = React.useState(1);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    // router.push(`/?page=${currentPage}`, undefined, { shallow: true });
-
     setCurrentPage(value);
 
     return router.push(`/search/${search}?page=${value}`);
@@ -36,10 +40,6 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
     });
   }
 
-  // useEffect(() => {
-  //   setData(results);
-  // }, [results]);
-
   return (
     <Layout>
       <Container>
@@ -49,6 +49,7 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
             type="text"
             placeholder="Procure por um filme, série..."
             onChange={(e) => setSearch(e.target.value)}
+            value={search}
           />
           <button type="submit">Pesquisar</button>
         </form>
@@ -106,6 +107,7 @@ export async function getServerSideProps({
       list: results,
       page,
       total_pages,
+      searchParam: query.search,
     },
   };
 }

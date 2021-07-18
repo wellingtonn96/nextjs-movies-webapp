@@ -22,8 +22,6 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    router.push(`/?page=${currentPage}`, undefined, { shallow: true });
-
     setCurrentPage(value);
 
     return router.push(`/?page=${value}`);
@@ -50,7 +48,7 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
         {list && list.length > 0 ? (
           <MoviesContainer>
             {list
-              // .filter((item) => item.title !== undefined)
+              .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
                   <Link href={`/movie/${item.id}`}>
