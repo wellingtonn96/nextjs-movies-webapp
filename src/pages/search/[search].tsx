@@ -1,18 +1,32 @@
 import { FormEvent, useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import { Container, MoviesContainer } from "../../styles/home.styles";
 import Link from "next/link";
 import { args } from "../../configs/api";
+import Pagination from "../../components/Pagination";
 
 interface IPropsComponent {
-  results: any[];
+  list: any[];
+  page: number;
+  total_pages: number;
 }
-export default function Home({ results }: IPropsComponent) {
+
+export default function Home({ list, page, total_pages }: IPropsComponent) {
   const router = useRouter();
   // const [data, setData] = useState(results);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    // router.push(`/?page=${currentPage}`, undefined, { shallow: true });
+
+    setCurrentPage(value);
+
+    return router.push(`/search/${search}?page=${value}`);
+  };
 
   async function handleSearchMovie(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,9 +52,9 @@ export default function Home({ results }: IPropsComponent) {
           />
           <button type="submit">Pesquisar</button>
         </form>
-        {results && results.length > 0 ? (
+        {list && list.length > 0 ? (
           <MoviesContainer>
-            {results
+            {list
               .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
@@ -61,24 +75,37 @@ export default function Home({ results }: IPropsComponent) {
         ) : (
           <p>Nenhum filme encontrado</p>
         )}
+        <Pagination
+          total_pages={total_pages}
+          page={page}
+          handleChange={handleChange}
+        />
       </Container>
     </Layout>
   );
 }
+
 export async function getServerSideProps({
-  params,
+  query,
 }: {
-  params: {
+  query: {
     search: string;
+    page?: string;
   };
 }) {
   const response = await fetch(
-    `${args.base_url}/search/movie?api_key=${args.api_key}&language=pt-BR&query=${params.search}`
+    `${args.base_url}/search/movie?api_key=${args.api_key}&query=${
+      query.search
+    }&page=${query.page ? query.page : 1}&language=pt-BR`
   );
 
-  const list = await response.json();
+  const { results, page, total_pages } = (await response.json()) as any;
 
   return {
-    props: list,
+    props: {
+      list: results,
+      page,
+      total_pages,
+    },
   };
 }
