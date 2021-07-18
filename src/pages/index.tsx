@@ -2,17 +2,32 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
+import Pagination from "../components/Pagination";
 import { Container, MoviesContainer } from "../styles/home.styles";
+import React from "react";
 import Link from "next/link";
-import { args } from "../configs/api";
 
 interface IPropsComponent {
   list: any[];
+  page: number;
+  total_pages: number;
 }
 
-export default function Home({ list }: IPropsComponent) {
+export default function Home({ list, page, total_pages }: IPropsComponent) {
   const router = useRouter();
+
+  // const classes = useStyles();
+
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = React.useState(1);
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    router.push(`/?page=${currentPage}`, undefined, { shallow: true });
+
+    setCurrentPage(value);
+
+    return router.push(`/?page=${value}`);
+  };
 
   async function handleSearchMovie(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,7 +50,7 @@ export default function Home({ list }: IPropsComponent) {
         {list && list.length > 0 ? (
           <MoviesContainer>
             {list
-              .filter((item) => item.title !== undefined)
+              // .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
                   <Link href={`/movie/${item.id}`}>
@@ -55,6 +70,11 @@ export default function Home({ list }: IPropsComponent) {
         ) : (
           <p>Nenhum filme encontrado</p>
         )}
+        <Pagination
+          total_pages={total_pages}
+          page={page}
+          handleChange={handleChange}
+        />
       </Container>
     </Layout>
   );
@@ -66,14 +86,24 @@ export default function Home({ list }: IPropsComponent) {
 // ser repassado para o component e tudo ainda sera executado no lado servidor
 // Quando chegar no cliente só o componente será executado novamente, mas já com os dados.
 
-export async function getServerSideProps() {
-  const res = await fetch("http://localhost:3000/api/trending");
+export async function getServerSideProps({
+  query,
+}: {
+  query: {
+    page: string;
+  };
+}) {
+  const res = await fetch(
+    `http://localhost:3000/api/trending?page=${query.page ? query.page : 1}`
+  );
 
-  const { list } = (await res.json()) as any;
+  const { list, page, total_pages } = (await res.json()) as any;
 
   return {
     props: {
       list,
+      page,
+      total_pages,
     },
   };
 }
