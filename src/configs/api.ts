@@ -1,7 +1,7 @@
 const dev = process.env.NODE_ENV !== 'production';
 
 export const args = {
-  host: dev ? 'http://localhost:3000' : process.env.NODE_ENV,
+  host: dev ? 'http://localhost:3000' : process.env.VERCEL_URL,
   port: process.env.PORT,
   api_key: process.env.API_KEY,
   base_url: process.env.BASE_URL,
