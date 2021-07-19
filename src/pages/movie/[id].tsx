@@ -48,7 +48,7 @@ export async function getServerSideProps({
     id: string;
   };
 }) {
-  const results = await fetch(`http://localhost:3000/api/movie/${params.id}`);
+  const results = await fetch(`http:/127.0.0.1:3000/api/movie/${params.id}`);
 
   const movie = await results.json();
 
