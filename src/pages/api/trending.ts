@@ -7,6 +7,9 @@ interface IMovies {
   total_pages: number
 }
 
+
+// no navegador você consegue acessar a api em http://localhost:3000/api/trending?page=1
+// já que no next a pasta é o recurso e o arquivo é o endpoint
 export default async function handler(request: NextApiRequest, response: NextApiResponse<any>) {
   try {
     const { query } = request

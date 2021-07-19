@@ -1,5 +1,3 @@
-// https://api.themoviedb.org/3/movie/460465?api_key=2da3d8be687c892f18efb0676c3811ba&language=pt-BR
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { args } from '../../../configs/api'
 
