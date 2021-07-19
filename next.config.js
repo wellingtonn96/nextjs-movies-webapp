@@ -14,6 +14,6 @@ module.exports = {
     base_url: process.env.BASE_URL,
     hostname: process.env.HOSTNAME,
     port: process.env.PORT,
-    host: process.env.NEXT_PUBLIC_API_URL
+    host: process.env.NEXT_PUBLIC_VERCEL_URL
   }
 }
