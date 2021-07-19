@@ -6,6 +6,7 @@ import Pagination from "../components/Pagination";
 import { Container, MoviesContainer } from "../styles/home.styles";
 import React from "react";
 import Link from "next/link";
+import { args } from "../configs/api";
 
 interface IPropsComponent {
   list: any[];
@@ -92,7 +93,7 @@ export async function getServerSideProps({
   };
 }) {
   const res = await fetch(
-    `http://localhost:3000/api/trending?page=${query.page ? query.page : 1}`
+    `${args.host}/api/trending?page=${query.page ? query.page : 1}`
   );
 
   const { list, page, total_pages } = (await res.json()) as any;

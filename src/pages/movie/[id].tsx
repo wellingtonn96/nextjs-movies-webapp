@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Layout from "../../components/Layout";
+import { args } from "../../configs/api";
 import { Container } from "../../styles/movie.styles";
 
 export default function PostIdItem({
@@ -48,7 +49,7 @@ export async function getServerSideProps({
     id: string;
   };
 }) {
-  const results = await fetch(`http:/127.0.0.1:3000/api/movie/${params.id}`);
+  const results = await fetch(`${args.host}/api/movie/${params.id}`);
 
   const movie = await results.json();
 
