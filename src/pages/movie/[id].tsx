@@ -1,42 +1,47 @@
 import Image from "next/image";
 import Layout from "../../components/Layout";
-import { args } from "../../configs/api";
+import { GET_MOVIE_BY_ID } from "../../lib/graphql/queries";
 import { Container } from "../../styles/movie.styles";
+import { client } from "../../lib/apollo";
 
-export default function PostIdItem({
-  movie,
-}: {
+interface IPropsPostIdItem {
   movie: {
     title: string;
     overview: string;
-    poster_path: string;
     vote_average: number;
+    poster_path: string;
   };
-}) {
+}
+
+export default function PostIdItem({ movie }: IPropsPostIdItem) {
   return (
     <Layout>
       <Container>
-        <h1>{movie.title}</h1>
-        <div>
-          <Image
-            src={`http://image.tmdb.org/t/p/original${movie.poster_path}`}
-            alt="image movie"
-            width={500}
-            height={500}
-          />
-          <div>
-            {movie.vote_average ? (
-              <p>
-                Nota: <span>{movie.vote_average}</span>
-              </p>
-            ) : (
-              <p>
-                Nota: <span>Sem avaliação</span>
-              </p>
-            )}
-            <p>{movie.overview}</p>
-          </div>
-        </div>
+        {movie && (
+          <>
+            <h1>{movie.title}</h1>
+            <div>
+              <Image
+                src={`http://image.tmdb.org/t/p/original${movie.poster_path}`}
+                alt="image movie"
+                width={500}
+                height={500}
+              />
+              <div>
+                {movie.vote_average ? (
+                  <p>
+                    Nota: <span>{movie.vote_average}</span>
+                  </p>
+                ) : (
+                  <p>
+                    Nota: <span>Sem avaliação</span>
+                  </p>
+                )}
+                <p>{movie.overview}</p>
+              </div>
+            </div>
+          </>
+        )}
       </Container>
     </Layout>
   );
@@ -49,11 +54,23 @@ export async function getServerSideProps({
     id: string;
   };
 }) {
-  const results = await fetch(`${args.host}/api/movie/${params.id}`);
+  const { data } = await client.query({
+    query: GET_MOVIE_BY_ID,
+    variables: {
+      movieId: params.id,
+    },
+  });
 
-  const movie = await results.json();
+  const movie = data.getMovieById;
 
   return {
-    props: movie,
+    props: {
+      movie: {
+        title: movie.title,
+        overview: movie.overview,
+        vote_average: movie.vote_average,
+        poster_path: movie.poster_path,
+      },
+    },
   };
 }
