@@ -1,12 +1,25 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 export const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  
+
+  .link-favorites {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    position: absolute;
+    right: 40;
+    text-transform: uppercase;
+  }
+
   h1 {
     text-align: center;
     margin: 40px 0;
+  }
+
+  .link-favorite {
+    text-decoration: none;
   }
 
   form {
@@ -23,7 +36,7 @@ export const Container = styled.div`
       padding: 0 20px;
       font-size: 16px;
     }
-    
+
     button {
       height: 40px;
       background-color: #111111;
@@ -33,19 +46,19 @@ export const Container = styled.div`
       border: 0;
     }
   }
-    
+
   p {
     text-align: center;
     font-weight: bold;
   }
-`
+`;
 
 export const MoviesContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-  
+
   > div {
     width: 20%;
     display: flex;
@@ -53,14 +66,14 @@ export const MoviesContainer = styled.div`
     align-items: center;
     padding: 10px;
 
-    @media(max-width: 760px) {
+    @media (max-width: 760px) {
       width: 100%;
     }
   }
-`
+`;
 
 export const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   padding: 30px 0;
-`
+`;
