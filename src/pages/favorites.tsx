@@ -1,47 +1,45 @@
-import { FormEvent, useState, useEffect } from "react";
-import React from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Layout from "../../components/Layout";
-import { Container, MoviesContainer } from "../../styles/home.styles";
+import Layout from "../components/Layout";
+import Pagination from "../components/Pagination";
+import { Container, MoviesContainer } from "../styles/home.styles";
+import React from "react";
 import Link from "next/link";
-import { args } from "../../configs/api";
-import Pagination from "../../components/Pagination";
+import { args } from "../configs/api";
 import Loader from "react-loader-spinner";
-import { client } from "../../lib/apollo";
-import { GET_MOVIES_BY_NAME } from "../../lib/graphql/queries";
+import { FiHeart } from "react-icons/fi";
+import { Button } from "@material-ui/core";
 
 interface IPropsComponent {
   list: any[];
   page: number;
   total_pages: number;
-  searchParam: string;
 }
 
-export default function Home({
+const FavoriesMoviesPage: React.FC<IPropsComponent> = ({
   list,
   page,
   total_pages,
-  searchParam,
-}: IPropsComponent) {
-  const router = useRouter();
-  // const [data, setData] = useState(results);
+}) => {
   const [movies, setMovies] = useState<any[] | undefined>(undefined);
-  const [search, setSearch] = useState(searchParam);
-  const [, setCurrentPage] = React.useState(1);
+  const router = useRouter();
+
+  // const classes = useStyles();
+
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
-    router.push(`/search/${search}?page=${value}`);
+    router.push(`/?page=${value}`);
     return setMovies(undefined);
   };
 
   async function handleSearchMovie(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    router.push({
-      pathname: `/search/${search}`,
-    });
+    return router.push(`/search/${search}`);
   }
 
   useEffect(() => {
@@ -51,19 +49,26 @@ export default function Home({
   return (
     <Layout>
       <Container>
+        <div className="link-favorites">
+          <FiHeart size={40} />
+          <Link href={`favorites`}>
+            <a style={{ marginLeft: "10px" }} className="link-favorite">
+              filmes favoritos
+            </a>
+          </Link>
+        </div>
         <h1>Filmes em destaque</h1>
         <form onSubmit={handleSearchMovie}>
           <input
             type="text"
             placeholder="Procure por um filme, série..."
             onChange={(e) => setSearch(e.target.value)}
-            value={search}
           />
           <button type="submit">Pesquisar</button>
         </form>
         {movies ? (
           <MoviesContainer>
-            {list
+            {movies
               .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
@@ -78,6 +83,17 @@ export default function Home({
                       <p>{item.title}</p>
                     </a>
                   </Link>
+                  <div>
+                    {item.vote_average ? (
+                      <p>
+                        Nota: <span>{item.vote_average}</span>
+                      </p>
+                    ) : (
+                      <p>
+                        Nota: <span>Sem avaliação</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
           </MoviesContainer>
@@ -100,34 +116,28 @@ export default function Home({
       </Container>
     </Layout>
   );
-}
+};
+
+export default FavoriesMoviesPage;
 
 export async function getServerSideProps({
   query,
 }: {
   query: {
-    search: string;
-    page?: string;
+    page: string;
   };
 }) {
-  console.log(query.page);
+  const res = await fetch(
+    `${args.host}/api/trending?page=${query.page ? query.page : 1}`
+  );
 
-  const { data } = await client.query({
-    query: GET_MOVIES_BY_NAME,
-    variables: {
-      page: query.page ? parseFloat(query.page) : 1,
-      name: query.search,
-    },
-  });
-
-  const { results, total_pages, page } = data.getMoviesByName;
+  const { list, page, total_pages } = (await res.json()) as any;
 
   return {
     props: {
-      list: results ? results : [],
-      page: page ? page : 0,
-      total_pages: total_pages ? total_pages : 0,
-      searchParam: query.search,
+      list,
+      page,
+      total_pages,
     },
   };
 }

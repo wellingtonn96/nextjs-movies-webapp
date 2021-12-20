@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
@@ -6,7 +6,10 @@ import Pagination from "../components/Pagination";
 import { Container, MoviesContainer } from "../styles/home.styles";
 import React from "react";
 import Link from "next/link";
-import { args } from "../configs/api";
+import Loader from "react-loader-spinner";
+import { FiHeart } from "react-icons/fi";
+import { GET_ALL_TRENDING_MOVIES } from "../lib/graphql/queries";
+import { client } from "../lib/apollo";
 
 interface IPropsComponent {
   list: any[];
@@ -14,7 +17,8 @@ interface IPropsComponent {
   total_pages: number;
 }
 
-export default function Home({ list, page, total_pages }: IPropsComponent) {
+const Home: React.FC<IPropsComponent> = ({ list, page, total_pages }) => {
+  const [movies, setMovies] = useState<any[] | undefined>(undefined);
   const router = useRouter();
 
   // const classes = useStyles();
@@ -24,8 +28,8 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
-
-    return router.push(`/?page=${value}`);
+    router.push(`/?page=${value}`);
+    return setMovies(undefined);
   };
 
   async function handleSearchMovie(e: FormEvent<HTMLFormElement>) {
@@ -34,9 +38,21 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
     return router.push(`/search/${search}`);
   }
 
+  useEffect(() => {
+    setMovies(list);
+  }, [list]);
+
   return (
     <Layout>
       <Container>
+        <div className="link-favorites">
+          <FiHeart size={40} />
+          <Link href={`favorites`}>
+            <a style={{ marginLeft: "10px" }} className="link-favorite">
+              filmes favoritos
+            </a>
+          </Link>
+        </div>
         <h1>Filmes em destaque</h1>
         <form onSubmit={handleSearchMovie}>
           <input
@@ -46,9 +62,9 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
           />
           <button type="submit">Pesquisar</button>
         </form>
-        {list && list.length > 0 ? (
+        {movies ? (
           <MoviesContainer>
-            {list
+            {movies
               .filter((item) => item.title !== undefined)
               .map((item, index) => (
                 <div key={index}>
@@ -63,11 +79,31 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
                       <p>{item.title}</p>
                     </a>
                   </Link>
+                  <div style={{ display: "flex" }}>
+                    {item.vote_average ? (
+                      <p>
+                        Nota: <span>{item.vote_average}</span>
+                      </p>
+                    ) : (
+                      <p>
+                        Nota: <span>Sem avaliação</span>
+                      </p>
+                    )}
+                    <FiHeart size={22} style={{ marginLeft: "10px" }} />
+                  </div>
                 </div>
               ))}
           </MoviesContainer>
         ) : (
-          <p>Nenhum filme encontrado</p>
+          <div
+            style={{
+              display: "flex",
+              padding: "40px 0",
+              justifyContent: "center",
+            }}
+          >
+            <Loader type="Oval" color="#111111" height={80} width={80} />
+          </div>
         )}
         <Pagination
           total_pages={total_pages}
@@ -77,13 +113,9 @@ export default function Home({ list, page, total_pages }: IPropsComponent) {
       </Container>
     </Layout>
   );
-}
+};
 
-/* ---------------Server Side Rendering--------------------------*/
-
-// função que será executada ainda no lado do servidor onde os dados vai
-// ser repassado para o component e tudo ainda sera executado no lado servidor
-// Quando chegar no cliente só o componente será executado novamente, mas já com os dados.
+export default Home;
 
 export async function getServerSideProps({
   query,
@@ -92,15 +124,18 @@ export async function getServerSideProps({
     page: string;
   };
 }) {
-  const res = await fetch(
-    `${args.host}/api/trending?page=${query.page ? query.page : 1}`
-  );
+  const { data } = await client.query({
+    query: GET_ALL_TRENDING_MOVIES,
+    variables: {
+      page: query.page ? parseFloat(query.page) : 1,
+    },
+  });
 
-  const { list, page, total_pages } = (await res.json()) as any;
+  const { results, page, total_pages } = data.getAllTreddingMovies;
 
   return {
     props: {
-      list,
+      list: results,
       page,
       total_pages,
     },
