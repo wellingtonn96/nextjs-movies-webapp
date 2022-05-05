@@ -32,7 +32,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          yarn ci
+          yarn install
           yarn build
           yarn start
 
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Run a one-line script
         run: |
-          yarn ci
+          yarn install
           yarn build
           yarn start
 
@@ -62,6 +62,6 @@ jobs:
     steps:
       - name: Run a one-line script
         run: |
-          yarn ci
+          yarn install
           yarn build
           yarn start
