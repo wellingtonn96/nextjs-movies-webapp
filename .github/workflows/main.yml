@@ -31,4 +31,4 @@ jobs:
           node-version: 16.x
       # Runs a single command using the runners shell
       - run: yarn install
-      - run: yarn build --if-present
+      - run: yarn build
