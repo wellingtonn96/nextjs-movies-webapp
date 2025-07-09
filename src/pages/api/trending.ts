@@ -28,6 +28,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     
     return response.status(200).json(data)  
   } catch (error) {
-    return response.status(404).json({ err: error.message })
+    const message = error instanceof Error ? error.message : String(error);
+    return response.status(404).json({ err: message });
   }
 }

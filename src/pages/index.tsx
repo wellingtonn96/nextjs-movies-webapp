@@ -100,9 +100,9 @@ export async function getServerSideProps({
 
   return {
     props: {
-      list,
-      page,
-      total_pages,
+      list: list ?? [],
+      page: page ?? 1,
+      total_pages: total_pages ?? 1,
     },
   };
 }
